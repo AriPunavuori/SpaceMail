@@ -1,11 +1,13 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public Color[] colors;
+
     public GameObject goalPrefab;
     public GameObject ufoPrefab;
+    public GameObject playerPrefab;
 
     public int numberOfCircles;
     public float radiusDelta;
@@ -20,6 +22,7 @@ public class GameManager : MonoBehaviour
     {
         GoalSpawner();
         UfoSpawner();
+        PlayerSpawner();
     }
 
     void GoalSpawner()
@@ -35,6 +38,9 @@ public class GameManager : MonoBehaviour
 
     void UfoSpawner()
     {
+        var startUfo = Instantiate(ufoPrefab);
+        ufos.Add(startUfo);
+
         for (int i = 0; i < numberOfCircles; i++)
         {
             //Debug.Log("Circle: " + i);
@@ -59,8 +65,16 @@ public class GameManager : MonoBehaviour
                 ufos.Add(u);
                 var ufoPosVector = PositionVector(j * degrees + rnd);
                 u.transform.position = RandomVector(ufoPosVector.normalized * (1 + i) * radiusDelta);
+                u.GetComponentInChildren<SpriteRenderer>().color = UfoColor();
             }
         }
+    }
+
+    void PlayerSpawner()
+    {
+        var p = Instantiate(playerPrefab);
+        p.transform.parent = ufos[0].transform;
+        p.GetComponent<Player>().target = ufos[0].transform;
     }
 
     Vector3 PositionVector(float degrees)
@@ -79,5 +93,10 @@ public class GameManager : MonoBehaviour
         Vector3 sumVector = posVec + randomVector;
 
         return sumVector;
+    }
+
+    Color UfoColor()
+    {
+        return colors[Random.Range(0, colors.Length)];
     }
 }

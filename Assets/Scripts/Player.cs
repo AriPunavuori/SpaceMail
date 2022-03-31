@@ -21,6 +21,7 @@ public class Player : MonoBehaviour
     {
         playerState = PlayerState.Landed;
         GameObject.Find("LaunchButton").GetComponent<Button>().onClick.AddListener(Launch);
+        Camera.main.GetComponent<FollowingCamera>().target = this.transform;
     }
 
     private void Update()
