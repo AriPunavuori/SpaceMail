@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class Initializer : MonoBehaviour
 {
@@ -15,8 +17,7 @@ public class Initializer : MonoBehaviour
     public float radiusDelta;
     public float ufoDelta;
 
-    Vector3 rotationAxis = new Vector3(0f, 1f, 0f);
-    public Vector2 rotationMinMax = new Vector2(2.5f, 3.5f);
+    public Vector2 rotationTimeMinMax = new Vector2(2.5f, 3.5f);
     public Vector2 randomSize;
     public float randomDistance;
 
@@ -38,9 +39,9 @@ public class Initializer : MonoBehaviour
         Initialize();
     }
 
-
     void Initialize()
     {
+        GameManager.Instance.GameStart();
         GoalSpawner();
         UfoSpawner();
         PlayerSpawner();
@@ -53,7 +54,7 @@ public class Initializer : MonoBehaviour
         degrees = Random.Range(0f, 360f);
         var goalPosVector = PositionVector(degrees);
         g.transform.position = RandomVector(goalPosVector.normalized * ((numberOfCircles * radiusDelta) - .5f * radiusDelta));
-        g.transform.localScale = g.transform.localScale * 2;
+        g.transform.localScale = g.transform.localScale * 3.5f;
         g.gameObject.name = "Goal";
     }
 
@@ -95,11 +96,11 @@ public class Initializer : MonoBehaviour
 
         p.transform.parent = ufos[0].transform;
 
-        var player = p.GetComponent<Player>();
+        GameManager.Instance.player = p.GetComponent<Player>();
 
-        player.target = ufos[0].transform;
+        GameManager.Instance.player.target = ufos[0].transform;
 
-        player.endOfTheWorld = numberOfCircles * radiusDelta + radiusDelta;
+        GameManager.Instance.player.endOfTheWorld = numberOfCircles * radiusDelta + radiusDelta * 2;
     }
 
     void Configure(GameObject ufo, Vector3 pos)
@@ -110,7 +111,7 @@ public class Initializer : MonoBehaviour
 
         ufo.GetComponentInChildren<SpriteRenderer>().color = UfoColor();
 
-        float rotationTime = Random.Range(rotationMinMax.x, rotationMinMax.y);
+        float rotationTime = Random.Range(rotationTimeMinMax.x, rotationTimeMinMax.y);
 
         float rnd = Random.Range(0f, 1f);
 

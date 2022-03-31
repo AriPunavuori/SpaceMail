@@ -17,14 +17,13 @@ public class Player : MonoBehaviour
     float landingTime = 1f;
     float flyTime = 1f;
 
-    bool dead;
+    bool gameEnded;
 
     int tweenId;
 
     void Start()
     {
         playerState = PlayerState.Landed;
-        GameObject.Find("LaunchButton").GetComponent<Button>().onClick.AddListener(Launch);
         Camera.main.GetComponent<FollowingCamera>().target = this.transform;
     }
 
@@ -33,7 +32,7 @@ public class Player : MonoBehaviour
         if (playerState != PlayerState.Flying)
             return;
 
-        if (dead)
+        if (gameEnded)
             return;
 
         UfoCheck();
@@ -50,15 +49,19 @@ public class Player : MonoBehaviour
 
     void Landed()
     {
+        if(target.gameObject.name == "Goal")
+        {
+            gameEnded = true;
+            GameManager.Instance.GameWon();
+            transform.LookAt(transform.position + Vector3.forward);
+        }
+
         playerState = PlayerState.Landed;
         transform.parent = target;
     }
 
     public void Launch()
     {
-        if (dead)
-            GameManager.Instance.Restart();
-
         if (playerState != PlayerState.Landed)
             return;
 
@@ -73,6 +76,12 @@ public class Player : MonoBehaviour
         tweenId = LeanTween.move(gameObject, transform.position + transform.forward * speed, flyTime).setOnComplete(Fly).id;
     }
 
+
+    void Spin()
+    {
+        LeanTween.rotateAroundLocal(gameObject, Vector3.up, 360f, flyTime * 5f).setRepeat(-1);
+    }
+
     void UfoCheck()
     {
         var colliders = Physics.OverlapSphere(transform.position, ufoCheckSize);
@@ -83,13 +92,17 @@ public class Player : MonoBehaviour
             {
                 target = collider.transform;
                 Land();
+                break;
             }            
         }
 
         if (Vector3.Distance(Vector3.zero, transform.position) > endOfTheWorld)
         {
+            LeanTween.cancel(tweenId);         
+            LeanTween.move(gameObject, transform.position + transform.forward * (speed * 20f), flyTime * 30f).setEaseOutSine();
+            LeanTween.rotateAroundLocal(gameObject, Vector3.up, 720f, flyTime * 15f).setEaseInSine().setOnComplete(Spin);
             GameManager.Instance.GameOver();
-            dead = true;
+            gameEnded = true;
         }
     }
 }
