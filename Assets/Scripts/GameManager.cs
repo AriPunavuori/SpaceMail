@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public float radiusDelta;
     public float ufoDelta;
 
+    public Vector2 randomSize;
     public float randomDistance;
     public float randomShiftFactor;
 
@@ -39,6 +40,7 @@ public class GameManager : MonoBehaviour
     void UfoSpawner()
     {
         var startUfo = Instantiate(ufoPrefab);
+        startUfo.transform.localScale = Vector3.one * Random.Range(randomSize.x, randomSize.y);
         ufos.Add(startUfo);
 
         for (int i = 0; i < numberOfCircles; i++)
@@ -65,6 +67,7 @@ public class GameManager : MonoBehaviour
                 ufos.Add(u);
                 var ufoPosVector = PositionVector(j * degrees + rnd);
                 u.transform.position = RandomVector(ufoPosVector.normalized * (1 + i) * radiusDelta);
+                u.transform.localScale = Vector3.one * Random.Range(randomSize.x, randomSize.y);
                 u.GetComponentInChildren<SpriteRenderer>().color = UfoColor();
             }
         }

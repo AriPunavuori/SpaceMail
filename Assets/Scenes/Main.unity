@@ -569,6 +569,7 @@ MonoBehaviour:
   numberOfCircles: 5
   radiusDelta: 6.75
   ufoDelta: 6.75
+  randomSize: {x: 1.5, y: 2.5}
   randomDistance: 1
   randomShiftFactor: 0.9
   ufos: []
