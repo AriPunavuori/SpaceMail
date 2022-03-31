@@ -1,20 +1,24 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public enum PlayerState
 {
-    Landed, Flying, Landing, Launching
+    Landed, Flying, Landing, Launching, Dead
 }
 public class Player : MonoBehaviour
 {
     public PlayerState playerState;
     public Transform target;
+    public float endOfTheWorld;
 
     float speed = 10f;
     float ufoCheckSize = 1f;
     float landingTime = 1f;
     float flyTime = 1f;
-    
+
+    bool dead;
+
     int tweenId;
 
     void Start()
@@ -27,6 +31,9 @@ public class Player : MonoBehaviour
     private void Update()
     {
         if (playerState != PlayerState.Flying)
+            return;
+
+        if (dead)
             return;
 
         UfoCheck();
@@ -49,6 +56,9 @@ public class Player : MonoBehaviour
 
     public void Launch()
     {
+        if (dead)
+            GameManager.Instance.Restart();
+
         if (playerState != PlayerState.Landed)
             return;
 
@@ -73,9 +83,13 @@ public class Player : MonoBehaviour
             {
                 target = collider.transform;
                 Land();
-            }
-            
+            }            
+        }
+
+        if (Vector3.Distance(Vector3.zero, transform.position) > endOfTheWorld)
+        {
+            GameManager.Instance.GameOver();
+            dead = true;
         }
     }
-
 }
