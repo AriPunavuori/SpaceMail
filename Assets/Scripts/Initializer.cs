@@ -56,6 +56,7 @@ public class Initializer : MonoBehaviour
         g.transform.position = RandomVector(goalPosVector.normalized * ((numberOfCircles * radiusDelta) - .5f * radiusDelta));
         g.transform.localScale = g.transform.localScale * 3.5f;
         g.gameObject.name = "Goal";
+        LeanTween.scale(g, Vector3.one * 4f, 1.5f).setEaseInOutSine().setLoopPingPong(-1);
     }
 
     void UfoSpawner()

@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public enum PlayerState
 {
-    Landed, Flying, Landing, Launching, Dead
+    Landed, Flying, Landing, Launching, GameEnded
 }
 public class Player : MonoBehaviour
 {
@@ -14,8 +14,8 @@ public class Player : MonoBehaviour
 
     float speed = 10f;
     float ufoCheckSize = 1f;
-    float landingTime = 1f;
-    float flyTime = 1f;
+    float landingTime = .2f;
+    float flyTime = .5f;
 
     bool gameEnded;
 
@@ -40,6 +40,8 @@ public class Player : MonoBehaviour
 
     void Land()
     {
+        GameManager.Instance.audioSources[2].Play();
+
         playerState = PlayerState.Landing;
         
         LeanTween.cancel(tweenId);
@@ -53,15 +55,19 @@ public class Player : MonoBehaviour
 
     void Landed()
     {
-        if(target.gameObject.name == "Goal")
+        if (target.gameObject.name == "Goal")
         {
             gameEnded = true;
             GameManager.Instance.GameWon();
-            transform.LookAt(transform.position + Vector3.forward);
+            var angleDiff = Vector3.SignedAngle(transform.forward, Vector3.forward, Vector3.up);
+            LeanTween.rotateAroundLocal(gameObject, Vector3.up, angleDiff, landingTime).setEaseOutCirc();
+            playerState = PlayerState.GameEnded;
         }
-
-        playerState = PlayerState.Landed;
-        transform.parent = target;
+        else
+        {
+            transform.parent = target;
+            playerState = PlayerState.Landed;
+        }
     }
 
     public void Launch()
@@ -69,6 +75,7 @@ public class Player : MonoBehaviour
         if (playerState != PlayerState.Landed)
             return;
 
+        GameManager.Instance.audioSources[3].Play();
         transform.parent = null;
         playerState = PlayerState.Launching;
         LeanTween.move(gameObject, transform.position + transform.forward, flyTime / speed * 5f).setEaseInQuad().setOnComplete(Fly);
@@ -107,6 +114,7 @@ public class Player : MonoBehaviour
             LeanTween.rotateAroundLocal(gameObject, Vector3.up, 720f, flyTime * 15f).setEaseInSine().setOnComplete(Spin);
             GameManager.Instance.GameOver();
             gameEnded = true;
+            playerState = PlayerState.GameEnded;
         }
     }
 }
