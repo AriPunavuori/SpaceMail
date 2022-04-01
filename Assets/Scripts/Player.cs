@@ -43,7 +43,11 @@ public class Player : MonoBehaviour
         playerState = PlayerState.Landing;
         
         LeanTween.cancel(tweenId);
-        transform.LookAt(target);
+
+        var dir = target.position - transform.position;
+        var angleDiff = Vector3.SignedAngle(transform.forward, dir, Vector3.up);
+        LeanTween.rotateAroundLocal(gameObject, Vector3.up, angleDiff, landingTime).setEaseOutCirc();
+
         LeanTween.move(gameObject, target.position, landingTime).setEaseOutQuad().setOnComplete(Landed);
     }
 
