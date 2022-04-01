@@ -94,6 +94,7 @@ public class Initializer : MonoBehaviour
     {
         var p = Instantiate(playerPrefab);
 
+        p.transform.localScale = Vector3.one * 1.2f;
         p.transform.parent = ufos[0].transform;
 
         GameManager.Instance.player = p.GetComponent<Player>();
